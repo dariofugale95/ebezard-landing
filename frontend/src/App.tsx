@@ -3,13 +3,10 @@ import { useEffect, useState } from "react";
 import "./i18n";
 
 import { Box } from "@mui/material";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainContent from "./components/MainContent";
 import TopBarTabs from "./components/TopBarTabs";
 import Footer from "./components/Footer";
-
-
-
 
 function App() {
   const [info, setInfo] = useState<any>(null);
@@ -34,7 +31,9 @@ function App() {
     <BrowserRouter>
       <TopBarTabs />
       <Box sx={{ pt: 1, minHeight: "100vh", width: '100vw', background: "linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%)", px: 0, m: 0 }}>
-        <MainContent info={info} loading={loading} error={error} />
+        <Routes>
+          <Route path="*" element={<MainContent info={info} loading={loading} error={error} />} />
+        </Routes>
       </Box>
       <Footer year={info?.year} />
     </BrowserRouter>

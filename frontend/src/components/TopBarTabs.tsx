@@ -1,4 +1,6 @@
-import { AppBar, Tabs, Tab, Toolbar, Box } from "@mui/material";
+import React from "react";
+import { AppBar, Tabs, Tab, Toolbar, Box, Avatar, Menu, MenuItem, IconButton } from "@mui/material";
+import { useAuth } from "./AuthContext";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
@@ -8,8 +10,13 @@ function TopBarTabs() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
   const tabPaths = ["/", "/features", "/pricing", "/faq", "/join"];
   const currentTab = tabPaths.findIndex((p) => p === location.pathname);
+  // Avatar menu state
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
   return (
     <AppBar position="fixed" color="inherit" elevation={0} sx={{ zIndex: 1201, background: 'linear-gradient(90deg, #fffbe6 0%, #d3ad46 100%)', boxShadow: 'none', border: 'none', width: '100vw', left: 0, right: 0 }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -27,8 +34,54 @@ function TopBarTabs() {
           <Tab label={t("tabFAQ", "FAQ")} />
           <Tab label={t("tabJoin", "Join")} />
         </Tabs>
-        <Box sx={{ minWidth: 120 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 120 }}>
           <LanguageSelector />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <button
+              style={{
+                background: '#ffe9a0',
+                color: '#2d2918',
+                border: 'none',
+                borderRadius: 6,
+                padding: '7px 18px',
+                fontWeight: 700,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                marginLeft: 4
+              }}
+              onClick={() => navigate('/join')}
+            >{t('register', 'Sign Up')}</button>
+            {!isAuthenticated ? (
+              <button
+                style={{
+                  background: '#4390a9',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '7px 18px',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s',
+                  marginLeft: 4
+                }}
+                onClick={() => navigate('/login')}
+              >{t('login', 'Sign In')}</button>
+            ) : (
+              <>
+                <IconButton onClick={handleAvatarClick} sx={{ ml: 1 }}>
+                  <Avatar sx={{ bgcolor: '#4390a9', width: 38, height: 38 }}>
+                    {user?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+                  </Avatar>
+                </IconButton>
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                  <MenuItem disabled>{user?.username || user?.email || 'Utente'}</MenuItem>
+                  <MenuItem onClick={() => { handleMenuClose(); logout(); window.location.href = '/'; }}>{t('logout', 'Logout')}</MenuItem>
+                </Menu>
+              </>
+            )}
+          </Box>
         </Box>
       </Toolbar>
     </AppBar>

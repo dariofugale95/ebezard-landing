@@ -35,5 +35,19 @@
   "register": "Register",
   "alreadyAccount": "Already have an account?",
   "login": "Login",
-  "year": "2025"
+  "year": "2025",
+  "username": "Username",
+  "email": "Email",
+  "newPassword": "Password",
+  "repeatPassword": "Repeat password",
+  "registering": "Registering...",
+  "registerSuccess": "Registration successful! You can now log in.",
+  "passwordsDontMatch": "Passwords do not match.",
+  "registerError": "Registration error",
+  "home": "Home",
+  "privacy": "Privacy",
+  "terms": "Terms",
+  "createAccount": "Create a new account",
+  "registerBusiness": "Register as Business",
+  "registerCustomer": "Register as Customer"
 }

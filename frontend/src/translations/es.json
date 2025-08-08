@@ -35,5 +35,19 @@
   "register": "Registrarse",
   "alreadyAccount": "¿Ya tienes una cuenta?",
   "login": "Iniciar sesión",
-  "year": "2025"
+  "year": "2025",
+  "username": "Usuario",
+  "email": "Email",
+  "newPassword": "Contraseña",
+  "repeatPassword": "Repetir contraseña",
+  "registering": "Registrando...",
+  "registerSuccess": "¡Registro exitoso! Ahora puedes iniciar sesión.",
+  "passwordsDontMatch": "Las contraseñas no coinciden.",
+  "registerError": "Error de registro",
+  "home": "Inicio",
+  "privacy": "Privacidad",
+  "terms": "Términos",
+  "createAccount": "Crear una nueva cuenta",
+  "registerBusiness": "Registrarse como empresa",
+  "registerCustomer": "Registrarse como cliente"
 }

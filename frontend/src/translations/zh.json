@@ -35,5 +35,19 @@
   "register": "注册",
   "alreadyAccount": "已有账户？",
   "login": "登录",
-  "year": "2025"
+  "year": "2025",
+  "username": "用户名",
+  "email": "邮箱",
+  "newPassword": "密码",
+  "repeatPassword": "重复密码",
+  "registering": "注册中...",
+  "registerSuccess": "注册成功！现在可以登录了。",
+  "passwordsDontMatch": "密码不匹配。",
+  "registerError": "注册错误",
+  "home": "首页",
+  "privacy": "隐私",
+  "terms": "条款",
+  "createAccount": "创建新账户",
+  "registerBusiness": "注册为企业",
+  "registerCustomer": "注册为客户"
 }

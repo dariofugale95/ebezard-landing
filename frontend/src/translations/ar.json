@@ -35,5 +35,19 @@
   "register": "سجل",
   "alreadyAccount": "لديك حساب بالفعل؟",
   "login": "تسجيل الدخول",
-  "year": "2025"
+  "year": "2025",
+  "username": "اسم المستخدم",
+  "email": "البريد الإلكتروني",
+  "newPassword": "كلمة المرور",
+  "repeatPassword": "تكرار كلمة المرور",
+  "registering": "جارٍ التسجيل...",
+  "registerSuccess": "تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول.",
+  "passwordsDontMatch": "كلمات المرور غير متطابقة.",
+  "registerError": "خطأ في التسجيل",
+  "home": "الرئيسية",
+  "privacy": "الخصوصية",
+  "terms": "الشروط",
+  "createAccount": "إنشاء حساب جديد",
+  "registerBusiness": "التسجيل كشركة",
+  "registerCustomer": "التسجيل كعميل"
 }
