@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Box, Typography, Button } from "@mui/material";
@@ -6,99 +6,6 @@ import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import RegisterModal from "./RegisterModal";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import logo from '../assets/eBezard_logo.png';
-
-// --- LoginForm component ---
-function LoginForm({ t }: { t: any }) {
-  // Decodifica base64url per estrarre il payload dal JWT
-  function decodeJWT(token: string): any {
-    try {
-      const payload = token.split(".")[1];
-      const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-      const json = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map(function (c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-          })
-          .join("")
-      );
-      return JSON.parse(json);
-    } catch {
-      return null;
-    }
-  }
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const endpoint = `${import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8300"}/api/users/login/`;
-      const resp = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-      if (!resp.ok) {
-        const data = await resp.json().catch(() => ({}));
-        throw new Error(data.detail || "Login failed");
-      }
-      // Salva il token JWT in localStorage
-      const data = await resp.json();
-      if (data.access) localStorage.setItem("access_token", data.access);
-      if (data.refresh) localStorage.setItem("refresh_token", data.refresh);
-      // Decodifica il JWT per leggere user_type
-      const payload = data.access ? decodeJWT(data.access) : null;
-      if (payload?.user_type === "business") {
-        const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5180";
-        window.location.href = frontendUrl;
-      } else {
-        window.location.href = "/";
-      }
-    } catch (err: any) {
-      setError(err.message || "Login error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Box sx={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-      <Typography variant="h4" fontWeight={700} color="#4390a9" gutterBottom>
-        {t("loginTitle", "Accedi a eBezard")}
-      </Typography>
-      <Typography variant="body1" color="#64635a" sx={{ maxWidth: 400, textAlign: "center" }}>
-        {t("loginSubtitle", "Effettua il login per accedere alla piattaforma eBezard.")}
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 300, mt: 2 }}>
-        <input
-          type="text"
-          placeholder={t("usernameOrEmail", "Username o Email")}
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          style={{ padding: 12, borderRadius: 6, border: '1px solid #ccc', fontSize: 16 }}
-          required
-        />
-        <input
-          type="password"
-          placeholder={t("password", "Password")}
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{ padding: 12, borderRadius: 6, border: '1px solid #ccc', fontSize: 16 }}
-          required
-        />
-        <Button type="submit" variant="contained" color="primary" disabled={loading} sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
-          {loading ? t("loading", "Loading...") : t("loginButton", "Login")}
-        </Button>
-        {error && <Typography color="error" sx={{ mt: 1 }}>{error}</Typography>}
-      </Box>
-    </Box>
-  );
-}
 
 type StrengthBoxProps = {
   color: string;
@@ -118,12 +25,14 @@ function StrengthBox({ color, icon, title, desc }: StrengthBoxProps) {
   );
 }
 
-interface MainContentProps {
+type MainContentProps = {
   info: any;
   loading: boolean;
   error: string | null;
-}
-function MainContent({ info, loading, error }: MainContentProps) {
+  user: any;
+};
+
+function MainContent({ info, loading, error, user }: MainContentProps) {
   const { t } = useTranslation();
   const strengths = [
     {
@@ -148,11 +57,27 @@ function MainContent({ info, loading, error }: MainContentProps) {
   // Modal registration
   const [modalOpen, setModalOpen] = React.useState(false);
   const [registerType, setRegisterType] = React.useState<'customer' | 'business'>('customer');
+  console.debug("User info:", user);
   return (
     <Box sx={{ minHeight: '100vh', width: '100vw', bgcolor: 'transparent', background: 'linear-gradient(135deg, #fffbe6 0%, #f8f5e6 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', pt: 10, overflowX: 'hidden', px: 0, m: 0 }}>
       <Routes>
         <Route path="/login" element={
-          <LoginForm t={t} />
+          <Box sx={{ py: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
+            <Typography variant="h4" mb={2} color="#2d2918" sx={{ fontWeight: 700 }}>
+              {t("loginTitle", "Accedi a eBezard")}
+            </Typography>
+            <Typography variant="body1" mb={4} color="#64635a" sx={{ maxWidth: 400, textAlign: 'center' }}>
+              {t("loginDescription", "Per accedere a tutte le funzionalità, effettua il login tramite il nostro provider sicuro.")}
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              sx={{ px: 5, py: 2, fontWeight: 700, fontSize: '1.1rem', bgcolor: '#4390a9', color: '#fff', boxShadow: 2, '&:hover': { bgcolor: '#d3ad46', color: '#2d2918' } }}
+              onClick={() => { window.location.href = `${import.meta.env.VITE_API_GATEWAY_URL}/api/oauth/login`; }}
+            >
+              {t("loginButton", "Accedi con Single Sign-On")}
+            </Button>
+          </Box>
         } />
         <Route path="/" element={
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', px: 2, gap: 4 }}>

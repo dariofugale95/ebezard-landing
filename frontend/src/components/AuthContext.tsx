@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-// Decodifica base64url (per estrarre payload dal JWT)
+// Decode base64url (to extract payload from JWT)
 function decodeJWT(token: string): any {
   try {
     const payload = token.split(".")[1];
@@ -34,9 +34,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    setAccessToken(token);
-    setUser(token ? decodeJWT(token) : null);
+    // Always check session validity with the API Gateway on mount
+    const checkSession = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8300"}/api/me`,
+          { credentials: "include" }
+        );
+        if (res.ok) {
+          const userData = await res.json();
+          setUser(userData);
+          setAccessToken(localStorage.getItem("access_token"));
+        } else {
+          // Session invalid: clear everything
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          setAccessToken(null);
+          setUser(null);
+        }
+      } catch {
+        // Network error: treat as logged out
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        setAccessToken(null);
+        setUser(null);
+      }
+    };
+    checkSession();
   }, []);
 
   const login = (access: string, refresh?: string) => {
@@ -46,7 +70,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(decodeJWT(access));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Call the API Gateway logout endpoint
+      const res = await fetch(
+        `${import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8300"}/api/users/logout`,
+        {
+          method: "POST",
+          credentials: "include"
+        }
+      );
+      if (res.ok) {
+        // Get the logout URL from the response and redirect the user
+        const data = await res.json();
+        if (data.logout_url) {
+          window.location.href = data.logout_url;
+          return;
+        }
+      }
+    } catch (e) {
+      // Ignore network errors
+    }
+    // Always clear local tokens
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     setAccessToken(null);

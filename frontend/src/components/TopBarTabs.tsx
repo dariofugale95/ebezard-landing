@@ -1,22 +1,30 @@
 import React from "react";
 import { AppBar, Tabs, Tab, Toolbar, Box, Avatar, Menu, MenuItem, IconButton } from "@mui/material";
-import { useAuth } from "./AuthContext";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
 import logo from '../assets/eBezard_horizontal.png';
+import { useAuth } from "./AuthContext";
 
-function TopBarTabs() {
+// Add props type
+type TopBarTabsProps = {
+  user: any;
+};
+
+function TopBarTabs({ user }: TopBarTabsProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuth();
-  const tabPaths = ["/", "/features", "/pricing", "/faq", "/join"];
-  const currentTab = tabPaths.findIndex((p) => p === location.pathname);
+  // Determine if the user is authenticated based on the presence of user
+  const isAuthenticated = !!user;
   // Avatar menu state
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+  const tabPaths = ["/", "/features", "/pricing", "/faq", "/join"];
+  const currentTab = tabPaths.findIndex((p) => p === location.pathname);
+  const { logout } = useAuth();
+  
   return (
     <AppBar position="fixed" color="inherit" elevation={0} sx={{ zIndex: 1201, background: 'linear-gradient(90deg, #fffbe6 0%, #d3ad46 100%)', boxShadow: 'none', border: 'none', width: '100vw', left: 0, right: 0 }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -77,7 +85,7 @@ function TopBarTabs() {
                 </IconButton>
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
                   <MenuItem disabled>{user?.username || user?.email || 'Utente'}</MenuItem>
-                  <MenuItem onClick={() => { handleMenuClose(); logout(); window.location.href = '/'; }}>{t('logout', 'Logout')}</MenuItem>
+                  <MenuItem onClick={() => { handleMenuClose(); logout(); }}>{t('logout', 'Logout')}</MenuItem>
                 </Menu>
               </>
             )}
