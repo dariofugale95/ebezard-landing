@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkSession = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8300"}/api/me`,
+          `${import.meta.env.VITE_API_GATEWAY_URL || "https://localhost:8300"}/api/me`,
           { credentials: "include" }
         );
         if (res.ok) {
@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Call the API Gateway logout endpoint
       const res = await fetch(
-        `${import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8300"}/api/users/logout`,
+        `${import.meta.env.VITE_API_GATEWAY_URL || "https://localhost:8300"}/api/users/logout`,
         {
           method: "POST",
           credentials: "include"
