@@ -4,4 +4,5 @@ WORKDIR /app
 COPY . /app
 RUN npm install
 EXPOSE 8088
+ENV NODE_ENV=dev
 CMD ["npm", "run", "dev", "--", "--port", "8088", "--host", "0.0.0.0"]
