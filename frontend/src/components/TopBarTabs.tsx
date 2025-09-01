@@ -21,7 +21,10 @@ function TopBarTabs({ user }: TopBarTabsProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
-  const tabPaths = ["/", "/features", "/pricing", "/faq", "/join"];
+  // Se autenticato, rimuovi la tab Join
+  const tabPaths = isAuthenticated
+    ? ["/", "/features", "/pricing", "/faq", "/marketplace"]
+    : ["/", "/features", "/pricing", "/faq", "/join"];
   const currentTab = tabPaths.findIndex((p) => p === location.pathname);
   const { logout } = useAuth();
   
@@ -40,43 +43,13 @@ function TopBarTabs({ user }: TopBarTabsProps) {
           <Tab label={t("tabFeatures", "Features")} />
           <Tab label={t("tabPricing", "Pricing")} />
           <Tab label={t("tabFAQ", "FAQ")} />
-          <Tab label={t("tabJoin", "Join")} />
+          {isAuthenticated && <Tab label={t("tabMarketplace", "Marketplace")} />}
+          {!isAuthenticated && <Tab label={t("tabJoin", "Join")} />}
         </Tabs>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 120 }}>
           <LanguageSelector />
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <button
-              style={{
-                background: '#ffe9a0',
-                color: '#2d2918',
-                border: 'none',
-                borderRadius: 6,
-                padding: '7px 18px',
-                fontWeight: 700,
-                fontSize: '1rem',
-                cursor: 'pointer',
-                transition: 'background 0.2s',
-                marginLeft: 4
-              }}
-              onClick={() => navigate('/join')}
-            >{t('register', 'Sign Up')}</button>
-            {!isAuthenticated ? (
-              <button
-                style={{
-                  background: '#4390a9',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 6,
-                  padding: '7px 18px',
-                  fontWeight: 700,
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s',
-                  marginLeft: 4
-                }}
-                onClick={() => navigate('/login')}
-              >{t('login', 'Sign In')}</button>
-            ) : (
+            {isAuthenticated ? (
               <>
                 <IconButton onClick={handleAvatarClick} sx={{ ml: 1 }}>
                   <Avatar sx={{ bgcolor: '#4390a9', width: 38, height: 38 }}>
@@ -85,8 +58,46 @@ function TopBarTabs({ user }: TopBarTabsProps) {
                 </IconButton>
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
                   <MenuItem disabled>{user?.username || user?.email || 'Utente'}</MenuItem>
+                  {user?.user_type === 'business' && (
+                    <MenuItem onClick={() => { handleMenuClose(); window.location.href = import.meta.env.VITE_FRONTEND_URL; }}>
+                      {t('goDashboard', 'Vai alla Dashboard')}
+                    </MenuItem>
+                  )}
                   <MenuItem onClick={() => { handleMenuClose(); logout(); }}>{t('logout', 'Logout')}</MenuItem>
                 </Menu>
+              </>
+            ) : (
+              <>
+                <button
+                  style={{
+                    background: '#ffe9a0',
+                    color: '#2d2918',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '7px 18px',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    marginLeft: 4
+                  }}
+                  onClick={() => navigate('/join')}
+                >{t('register', 'Sign Up')}</button>
+                <button
+                  style={{
+                    background: '#4390a9',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '7px 18px',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    marginLeft: 4
+                  }}
+                  onClick={() => navigate('/login')}
+                >{t('login', 'Sign In')}</button>
               </>
             )}
           </Box>

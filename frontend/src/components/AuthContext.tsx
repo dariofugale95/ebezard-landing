@@ -73,29 +73,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     try {
       // Call the API Gateway logout endpoint
-      const res = await fetch(
+      await fetch(
         `${import.meta.env.VITE_API_GATEWAY_URL || "https://localhost:8300"}/api/users/logout`,
         {
           method: "POST",
           credentials: "include"
         }
       );
-      if (res.ok) {
-        // Get the logout URL from the response and redirect the user
-        const data = await res.json();
-        if (data.logout_url) {
-          window.location.href = data.logout_url;
-          return;
-        }
-      }
     } catch (e) {
       // Ignore network errors
     }
     // Always clear local tokens
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    setAccessToken(null);
-    setUser(null);
+    // Forza controllo sessione lato backend
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_GATEWAY_URL || "https://localhost:8300"}/api/me`,
+        { credentials: "include" }
+      );
+      if (res.ok) {
+        const userData = await res.json();
+        setUser(userData);
+        setAccessToken(localStorage.getItem("access_token"));
+      } else {
+        setUser(null);
+        setAccessToken(null);
+      }
+    } catch {
+      setUser(null);
+      setAccessToken(null);
+    }
+    // Redirect to landing page
+    window.location.href = "http://localhost:8088/";
   };
 
   return (
